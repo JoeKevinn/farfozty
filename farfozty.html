@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: Arial, sans-serif;
+            
+        }
+        
+        #fireworks {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #chat-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .slide {
+            display: none;
+            position: fixed;
+            width: 60%; /* Reduced from 80% for better centering */
+            height: 60%; /* Reduced from 80% */
+            left: 50%; /* Add this */
+            top: 50%; /* Add this */
+            transform: translate(-50%, -50%) rotate(-2deg); /* Modified */
+            object-fit: contain;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255,255,255,0.5);
+            animation: float 3s ease-in-out infinite;
+            transition: all 0.5s ease;
+            max-width: 800px; /* Add max dimensions */
+            max-height: 600px; /* Add max dimensions */
+        }
+        
+        #yt-player {
+            display: none;
+        }
+
+  
+        .end-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 1001;
+            padding: 15px 30px;
+            font-size: 24px;
+            background: #ff0066;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+        }
+        
+        .hidden-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 1001;
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .next-level-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background: #00ff88;
+            color: #000;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            display: none;
+            z-index: 1002;
+            font-size: 20px;
+            animation: bounce 2s infinite;
+        }
+    
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    
+        .video-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1003;
+        }
+
+        .video-page .next-level-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1006;
+        }
+    
+        #back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: #ff0066;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 1004;
+        }
+
+        .puzzle-game {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1005;
+        }
+    
+        .puzzle-title {
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+        }
+    
+        .puzzle-grid {
+            display: grid;
+            gap: 2px;
+            width: 600px;
+            height: 400px;
+            margin: 20px auto;
+            border: 2px solid white;
+        }
+    
+        .puzzle-piece {
+            background-size: 600px 400px;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: transform 0.3s;
+            cursor: move;
+            transition: all 0.3s;
+            filter: brightness(0.8);
+        }
+    
+        .puzzle-piece:hover {
+            transform: scale(1.05);
+            z-index: 1;
+            filter: brightness(1.2);
+    transform: scale(1.05) rotate(3deg);
+    box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+        .play-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            padding: 15px 30px;
+            background: #00a8ff;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 1006;
+            font-size: 20px;
+            animation: pulse 1.5s infinite;
+        }
+    
+        #finalLevelBtn {
+            display: none; /* Hidden by default */
+        }
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 600px;
+            margin: 20px auto;
+        }
+    
+        .memory-card {
+            width: 140px;
+            height: 140px;
+            background: #333;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+    
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+    
+        .memory-card .front,
+        .memory-card .back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 10px;
+        }
+    
+        .memory-card .front {
+            background: #444;
+            transform: rotateY(180deg);
+        }
+    
+        .memory-card .back {
+            background: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <p id="message">2ol kelmet el ser🔫</p>
+        <input type="text" id="user-input" autofocus>
+    </div>
+
+    <canvas id="fireworks"></canvas>
+    <div id="yt-player"></div>
+    
+    <img src="photo1.JPG" class="slide" alt="">
+    <img src="photo2.jpg" class="slide" alt="">
+    <img src="photo3.jpg" class="slide" alt="">
+        <img src="photo4.jpg" class="slide" alt="">
+        <img src="photo5.jpg" class="slide" alt="">
+        <img src="photo6.jpg" class="slide" alt="">
+        <img src="photo7.jpg" class="slide" alt="">
+        <img src="photo8.jpg" class="slide" alt="">
+        <img src="photo9.jpg" class="slide" alt="">
+        <img src="photo10.jpg" class="slide" alt="">
+        <img src="photo11.jpg" class="slide" alt="">
+        <img src="photo12.jpg" class="slide" alt="">
+        <img src="photo13.jpg" class="slide" alt="">
+        <img src="photo14.jpg" class="slide" alt="">
+        <img src="photo15.jpg" class="slide" alt="">
+        <img src="photo16.jpg" class="slide" alt="">
+        <img src="photo17.jpg" class="slide" alt="">
+        <img src="photo18.jpg" class="slide" alt="">
+        <img src="photo19.jpg" class="slide" alt="">
+        <img src="photo20.jpg" class="slide" alt="">
+        <img src="photo21.jpg" class="slide" alt="">
+        <img src="photo22.jpg" class="slide" alt="">
+        <img src="photo23.jpg" class="slide" alt="">
+        <img src="photo24.jpg" class="slide" alt="">
+        <img src="photo25.jpg" class="slide" alt="">
+        <img src="photo26.jpg" class="slide" alt="">
+        <img src="photo27.jpg" class="slide" alt="">
+        <img src="photo28.jpg" class="slide" alt="">
+        <img src="photo29.jpg" class="slide" alt="">
+        <img src="photo30.jpg" class="slide" alt="">
+        <img src="photo31.jpg" class="slide" alt="">
+        <img src="photo32.jpg" class="slide" alt="">
+        <img src="photo33.jpg" class="slide" alt="">
+        <img src="photo34.jpg" class="slide" alt="">
+        <img src="photo35.jpg" class="slide" alt="">
+        <img src="photo36.jpg" class="slide" alt="">
+        <img src="photo37.jpg" class="slide" alt="">
+        <img src="photo38.jpg" class="slide" alt="">
+        <img src="photo39.jpg" class="slide" alt="">
+        <img src="photo40.jpg" class="slide" alt="">
+        <img src="photo41.jpg" class="slide" alt="">
+        <img src="photo43.jpg" class="slide" alt="">
+        <img src="photo44.jpg" class="slide" alt="">
+        <img src="photo45.jpg" class="slide" alt="">
+        <img src="photo46.jpg" class="slide" alt="">
+        <img src="photo47.jpg" class="slide" alt="">
+        <img src="photo48.jpg" class="slide" alt="">
+        <img src="photo49.jpg" class="slide" alt="">
+        <img src="photo50.jpg" class="slide" alt="">
+        <img src="photo51.jpg" class="slide" alt="">
+        <img src="photo52.jpg" class="slide" alt="">
+        <img src="photo53.jpg" class="slide" alt="">
+        <img src="photo54.jpg" class="slide" alt="">
+    
+        <button id="endButton" class="end-button">Please Click Me</button>
+        <p id="hiddenMessage" class="hidden-message">Kol sana wenta tayb ya albe, aw ya uncle khalas enta 23 sanaaaa. 3gzt awe ya farfoztyyyyy bs lesa amar!
+            Msh mehtaga a2olak kalam enta akid 3arf ana bahebak ad eh, bgd my comfort zone w kol haga leyaa fl denya, 3awadtny 3n kol haga ya farfoztyyyy
+            w mabsuta m3ak mot fo2 ma tatakhyalllll. msh bahb el bna2dmennn bs get enta w khaltny m3rfsh a3ish mngherakkk😂 Rabena yekhalik leya ya albe w my7rmnish mnk abadan.
+            W etnaset ka eny maget w lw 7aset htksrny😂❤️ Our romantic song hahah, bahebak ya albe rabena yekhaleek leya 3ltol w my7rmnishhh mnk. BAHEBAK!!!
+        </p>
+
+        <button id="nextLevel" class="next-level-btn">Next Level →</button>
+
+      <div class="video-page" id="videoPage">
+    <button id="back-btn">← Back</button>
+    <button id="playVideoBtn" class="play-btn">▶️ Play Video</button>
+    <button id="finalLevelBtn" class="next-level-btn" style="display: none;">Final Puzzle Level →</button>
+
+    <!-- Embedded YouTube Video -->
+    <iframe id="mainVideo" 
+            width="560" height="315"
+            src="https://www.youtube.com/embed/hJb0SvFSYU8"
+            frameborder="0" 
+            allowfullscreen
+            style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); max-width:90%; max-height:90%; display:none;">
+    </iframe>
+</div>
+
+        
+
+        <div class="puzzle-game" id="puzzleGame">
+            <h2 class="puzzle-title">Match the pairs to unlock the song! 🎶</h2>
+            <div class="memory-grid" id="memoryGrid"></div>
+            <audio id="secretSong" src="song.mp3"></audio>
+        </div>
+        
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        // YouTube API setup
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        let player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                height: '0',
+                width: '0',
+                videoId: 'KbtwC_0Uh40',  // From your YouTube URL
+                playerVars: {
+                    autoplay: 1,
+                    controls: 0,
+                    disablekb: 1,
+                    modestbranding: 1,
+                    loop: 1,
+                    playlist: 'KbtwC_0Uh40'
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            event.target.mute(); // Start muted to avoid autoplay issues
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                event.target.playVideo(); // Loop the video
+            }
+        }
+
+        // Original game logic
+        let step = 0;
+    const answers = ["youm wara youm", "magany nom", "magany nom"];
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+
+    document.getElementById('user-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const userText = e.target.value.toLowerCase();
+            e.target.value = '';
+            
+            if (userText === answers[step]) {
+                step++;
+                let emojis = '';
+                switch(step) {
+                    case 1:
+                        emojis = '💃'.repeat(2);
+                        break;
+                    case 2:
+                        emojis = '💃'.repeat(5);
+                        break;
+                    case 3:
+                        emojis = '💃'.repeat(10);
+                        break;
+                }
+                document.getElementById('message').innerHTML = `habeby ${emojis}`;
+                
+                if (step === 3) {
+                    startCelebration();
+                }
+            } else {
+                document.getElementById('message').textContent = 'Try again!';
+            }
+        }
+    });
+
+        function startCelebration() {
+            // Hide chat interface
+            document.getElementById('chat-container').style.display = 'none';
+            
+            
+            // Start fireworks
+            const fireworksCanvas = document.getElementById('fireworks');
+            fireworksCanvas.style.display = 'block';
+            
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 7,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff0000', '#00ff00', '#0000ff']
+                });
+                confetti({
+                    particleCount: 7,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff0000', '#00ff00', '#0000ff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
+            // Start music
+            player.unMute();
+            player.playVideo();
+            
+            // Start slideshow
+            let slidesShown = 1;
+        const totalSlides = slides.length;
+            slides[currentSlide].style.display = 'block';
+            const slideInterval = setInterval(() => {
+                slides[currentSlide].style.transform = 'translate(-50%, -50%) scale(0.8) rotate(10deg)';
+                slides[currentSlide].style.opacity = '0';
+                
+                setTimeout(() => {
+                    slides[currentSlide].style.display = 'none';
+                    currentSlide = (currentSlide + 1) % totalSlides;
+                    slides[currentSlide].style.display = 'block';
+                    slides[currentSlide].style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+                    slides[currentSlide].style.opacity = '1';
+                    
+                    slidesShown++;
+                    if (slidesShown >= totalSlides) {
+                        clearInterval(slideInterval);
+                        document.getElementById('endButton').style.display = 'block';
+                        if(player && typeof player.stopVideo === 'function') {
+                            player.stopVideo();
+                        }
+                    }
+                }, 300); // Faster transition (300ms instead of 500)
+            }, 1000); // Faster slideshow (1000ms instead of 3000)
+    
+            // Add button click handler
+            document.getElementById('endButton').addEventListener('click', () => {
+                document.getElementById('endButton').style.display = 'none';
+                document.getElementById('hiddenMessage').style.display = 'block';
+                document.getElementById('nextLevel').style.display = 'block';
+                
+                // Optional: Add more effectss
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            });
+        }
+
+        const PUZZLE_ROWS = 3;
+const PUZZLE_COLS = 4;
+let correctPieces = 0;
+let currentLevel = 0;
+
+
+document.getElementById('nextLevel').addEventListener('click', () => {
+    currentLevel = 1;
+    document.getElementById('hiddenMessage').style.display = 'none';
+    document.getElementById('videoPage').style.display = 'block';
+    document.getElementById('nextLevel').style.display = 'none';
+});
+
+document.getElementById('playVideoBtn').addEventListener('click', () => {
+    const video = document.getElementById('mainVideo');
+    const playBtn = document.getElementById('playVideoBtn');
+    const finalBtn = document.getElementById('finalLevelBtn');
+
+    // Show the video and hide the play button
+    video.style.display = 'block';
+    playBtn.style.display = 'none';
+
+    // Wait for 30 seconds (or estimated video duration), then show the button
+    setTimeout(() => {
+        finalBtn.style.display = 'block';
+    }, 10000); // Change this value based on your video duration
+});
+
+
+document.getElementById('finalLevelBtn').addEventListener('click', () => {
+    currentLevel = 2;
+    document.getElementById('videoPage').style.display = 'none';
+    document.getElementById('puzzleGame').style.display = 'block';
+    initializeMemoryGame();
+});
+
+document.getElementById('back-btn').addEventListener('click', () => {
+    currentLevel = 0;
+    document.getElementById('videoPage').style.display = 'none';
+    document.getElementById('hiddenMessage').style.display = 'block';
+    document.getElementById('nextLevel').style.display = 'block';
+    
+    // Reset video
+    const video = document.getElementById('mainVideo');
+    video.pause();
+    video.currentTime = 0;
+    video.style.display = 'none';
+    document.getElementById('playVideoBtn').style.display = 'block';
+    document.getElementById('finalLevelBtn').style.display = 'none';
+});
+
+    function initializePuzzle() {
+    const grid = document.getElementById('puzzleGrid');
+    grid.style.gridTemplateColumns = `repeat(${PUZZLE_COLS}, 1fr)`;
+    grid.innerHTML = '';
+    
+    // Create puzzle pieces
+    const pieceWidth = 600 / PUZZLE_COLS;
+    const pieceHeight = 400 / PUZZLE_ROWS;
+
+    
+    // Create shuffled pieces
+    const pieces = Array.from({length: PUZZLE_ROWS * PUZZLE_COLS}, (_, i) => i);
+    shuffleArray(pieces);
+    
+    pieces.forEach((pieceIndex, i) => {
+        const piece = document.createElement('div');
+        piece.className = 'puzzle-piece';
+        piece.draggable = true;
+        piece.style.backgroundImage = 'url("puzzle-image.jpg")';
+        piece.style.backgroundPosition = 
+            `${-Math.floor(pieceIndex % PUZZLE_COLS) * pieceWidth}px 
+             ${-Math.floor(pieceIndex / PUZZLE_COLS) * pieceHeight}px`;
+        
+        piece.dataset.correctPosition = pieceIndex;
+        piece.dataset.currentPosition = i;
+        
+        piece.addEventListener('dragstart', handleDragStart);
+        piece.addEventListener('dragover', handleDragOver);
+        piece.addEventListener('drop', handleDrop);
+        
+        grid.appendChild(piece);
+    });
+}
+
+function handleDragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.dataset.currentPosition);
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    const fromIndex = e.dataTransfer.getData('text/plain');
+    const toIndex = e.target.dataset.currentPosition;
+    
+    swapPieces(fromIndex, toIndex);
+    checkPuzzleCompletion();
+}
+
+function swapPieces(fromIndex, toIndex) {
+    const pieces = [...document.querySelectorAll('.puzzle-piece')];
+    const temp = pieces[fromIndex].dataset.currentPosition;
+    
+    // Swap positions in DOM
+    const tempEl = pieces[fromIndex].cloneNode(true);
+    pieces[toIndex].parentNode.replaceChild(tempEl, pieces[toIndex]);
+    pieces[fromIndex].parentNode.replaceChild(pieces[toIndex], pieces[fromIndex]);
+    
+    // Update dataset
+    pieces[fromIndex].dataset.currentPosition = toIndex;
+    tempEl.dataset.currentPosition = fromIndex;
+}
+
+function checkPuzzleCompletion() {
+    const pieces = [...document.querySelectorAll('.puzzle-piece')];
+    correctPieces = pieces.filter(p => 
+        p.dataset.correctPosition === p.dataset.currentPosition
+    ).length;
+    
+    if(correctPieces === PUZZLE_ROWS * PUZZLE_COLS) {
+        // Play audio and show celebration
+        const audio = document.getElementById('secretSong');
+        audio.play().catch(error => {
+            // Handle audio play restrictions
+            alert('Click anywhere to play the special song!');
+            document.body.addEventListener('click', () => audio.play(), { once: true });
+        });
+        
+        confetti({ particleCount: 200, spread: 150 });
+        setTimeout(() => {
+            alert("🎉 Congratulations! You unlocked our song!");
+        }, 2000);
+    }
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function initializeMemoryGame() {
+    const grid = document.getElementById('memoryGrid');
+    grid.innerHTML = '';
+
+    // Create pairs of images (use your own images)
+    const images = [
+        'photo23.JPG', 'photo23.JPG',
+        'photo37.jpg', 'photo37.jpg',
+        'photo27.jpg', 'photo27.jpg',
+        'photo4.jpg', 'photo4.jpg',
+        'photo12.JPG', 'photo12.JPG',
+        'photo20.jpg', 'photo20.jpg',
+        'photo45.jpg', 'photo45.jpg',
+        'photo50.jpg', 'photo50.jpg',
+        'photo8.JPG', 'photo8.JPG',
+        'photo54.JPG', 'photo54.JPG',
+    ];
+
+    // Shuffle the images
+    shuffleArray(images);
+
+    // Create cards
+    images.forEach((img, index) => {
+        const card = document.createElement('div');
+        card.className = 'memory-card';
+        card.dataset.value = img;
+
+        const front = document.createElement('div');
+        front.className = 'front';
+        front.style.backgroundImage = `url(${img})`;
+        front.style.backgroundSize = 'cover';
+
+        const back = document.createElement('div');
+        back.className = 'back';
+        back.textContent = '❓';
+
+        card.appendChild(front);
+        card.appendChild(back);
+        card.addEventListener('click', flipCard);
+        grid.appendChild(card);
+    });
+}
+
+let hasFlippedCard = false;
+let lockBoard = false;
+let firstCard, secondCard;
+
+function flipCard() {
+    if (lockBoard) return;
+    if (this === firstCard) return;
+
+    this.classList.add('flipped');
+
+    if (!hasFlippedCard) {
+        // First card flipped
+        hasFlippedCard = true;
+        firstCard = this;
+    } else {
+        // Second card flipped
+        hasFlippedCard = false;
+        secondCard = this;
+
+        checkForMatch();
+    }
+}
+
+function checkForMatch() {
+    const isMatch = firstCard.dataset.value === secondCard.dataset.value;
+
+    if (isMatch) {
+        disableCards();
+        checkGameCompletion();
+    } else {
+        unflipCards();
+    }
+}
+
+function disableCards() {
+    firstCard.removeEventListener('click', flipCard);
+    secondCard.removeEventListener('click', flipCard);
+}
+
+function unflipCards() {
+    lockBoard = true;
+
+    setTimeout(() => {
+        firstCard.classList.remove('flipped');
+        secondCard.classList.remove('flipped');
+        lockBoard = false;
+    }, 1000);
+}
+
+function checkGameCompletion() {
+    const allCards = document.querySelectorAll('.memory-card');
+    const matchedCards = document.querySelectorAll('.memory-card.flipped');
+
+    if (allCards.length === matchedCards.length) {
+        // Play audio and show celebration
+        const audio = document.getElementById('secretSong');
+        audio.play().catch(error => {
+            alert('Click anywhere to play the special song!');
+            document.body.addEventListener('click', () => audio.play(), { once: true });
+        });
+
+        confetti({ particleCount: 200, spread: 150 });
+        setTimeout(() => {
+            alert("🎉 Congratulations! You unlocked our song!");
+        }, 2000);
+    }
+}
+document.getElementById('videoNextLevel').addEventListener('click', () => {
+    document.getElementById('videoPage').style.display = 'none';
+    document.getElementById('puzzleGame').style.display = 'block';
+    initializePuzzle();
+});
+    </script>
+</body>
+</html>
